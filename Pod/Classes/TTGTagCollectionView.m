@@ -16,6 +16,7 @@ static NSString *const TTGTagCollectionCellIdentifier = @"TTGTagCollectionCell";
 @interface TTGTagCollectionView () <UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout>
 @property (strong, nonatomic) UICollectionView *collectionView;
 @property (strong, nonatomic) TTGTagCollectionLayout *layout;
+@property (assign, nonatomic) CGFloat contentHeight;
 @end
 
 @implementation TTGTagCollectionView
@@ -69,7 +70,19 @@ static NSString *const TTGTagCollectionCellIdentifier = @"TTGTagCollectionCell";
 #pragma mark - UICollectionViewDelegateFlowLayout
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    return [_delegate tagCollectionView:self sizeForTagAtIndex:(NSUInteger) indexPath.row];
+    CGSize size = [_delegate tagCollectionView:self sizeForTagAtIndex:(NSUInteger) indexPath.row];
+
+    if (size.width > CGRectGetWidth(self.frame)) {
+        size.width = CGRectGetWidth(self.frame);
+
+        // Update tag view width
+        UIView *tagView = [_dataSource tagCollectionView:self tagViewForIndex:(NSUInteger) indexPath.row];
+        CGRect frame = tagView.frame;
+        frame.size = size;
+        tagView.frame = frame;
+    }
+
+    return size;
 }
 
 #pragma mark - Private methods
@@ -131,6 +144,11 @@ static NSString *const TTGTagCollectionCellIdentifier = @"TTGTagCollectionCell";
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
     if ([keyPath isEqualToString:@"contentSize"]) {
         CGSize contentSize = ((NSValue *)change[NSKeyValueChangeNewKey]).CGSizeValue;
+        
+        // Update height
+        _contentHeight = contentSize.height;
+        
+        // Call back
         if ([_delegate respondsToSelector:@selector(tagCollectionView:updateContentHeight:)]) {
             [_delegate tagCollectionView:self updateContentHeight:contentSize.height];
         }
