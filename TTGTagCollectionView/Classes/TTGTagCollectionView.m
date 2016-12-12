@@ -7,18 +7,23 @@
 //
 
 #import "TTGTagCollectionView.h"
-#import "TTGTagCollectionLayout.h"
 #import "TTGTagCollectionCell.h"
+#import "TTGTagCollectionLayout.h"
 
 static NSString *const TTGTagCollectionCellIdentifier = @"TTGTagCollectionCell";
 
 @interface TTGTagCollectionView () <UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout>
 @property (strong, nonatomic) UICollectionView *collectionView;
 @property (strong, nonatomic) TTGTagCollectionLayout *layout;
-@property (assign, nonatomic) CGFloat contentHeight;
 @end
 
 @implementation TTGTagCollectionView
+
+#pragma mark - Dealloc
+
+- (void)dealloc {
+    [_collectionView removeObserver:self forKeyPath:@"contentSize"];
+}
 
 #pragma mark - Init
 
@@ -40,7 +45,7 @@ static NSString *const TTGTagCollectionCellIdentifier = @"TTGTagCollectionCell";
     return self;
 }
 
-#pragma mark - Override
+#pragma mark - Layout
 
 - (void)layoutSubviews {
     [super layoutSubviews];
@@ -70,6 +75,13 @@ static NSString *const TTGTagCollectionCellIdentifier = @"TTGTagCollectionCell";
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     TTGTagCollectionCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:TTGTagCollectionCellIdentifier forIndexPath:indexPath];
     [cell setTagView:[_dataSource tagCollectionView:self tagViewForIndex:(NSUInteger) indexPath.row]];
+
+    cell.layer.shadowColor = _shadowColor.CGColor;
+    cell.layer.shadowOffset = _shadowOffset;
+    cell.layer.shadowRadius = _shadowRadius;
+    cell.layer.shadowOpacity = _shadowOpacity;
+    cell.layer.masksToBounds = NO;
+    
     return cell;
 }
 
@@ -86,8 +98,8 @@ static NSString *const TTGTagCollectionCellIdentifier = @"TTGTagCollectionCell";
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
     CGSize size = [_delegate tagCollectionView:self sizeForTagAtIndex:(NSUInteger) indexPath.row];
 
-    if (size.width > CGRectGetWidth(self.frame)) {
-        size.width = CGRectGetWidth(self.frame);
+    if (size.width > CGRectGetWidth(self.frame) - self.contentInset.left - self.contentInset.right) {
+        size.width = CGRectGetWidth(self.frame) - self.contentInset.left - self.contentInset.right;
 
         // Update tag view width
         UIView *tagView = [_dataSource tagCollectionView:self tagViewForIndex:(NSUInteger) indexPath.row];
@@ -106,64 +118,100 @@ static NSString *const TTGTagCollectionCellIdentifier = @"TTGTagCollectionCell";
         return;
     }
     
-    // Property
-    _horizontalSpacing = 4;
-    _verticalSpacing = 4;
+    // Shadow
+    _shadowColor = [UIColor blackColor];
+    _shadowOffset = CGSizeZero;
+    _shadowRadius = 0.0f;
+    _shadowOpacity = 0.5f;
 
-    // Init layout
-    TTGTagCollectionLayout *layout = [TTGTagCollectionLayout new];
-    layout.sectionInset = UIEdgeInsetsZero;
-    layout.scrollDirection = UICollectionViewScrollDirectionVertical;
-    layout.minimumInteritemSpacing = _horizontalSpacing;
-    layout.minimumLineSpacing = _verticalSpacing;
+    // Layout
+    _layout = [TTGTagCollectionLayout new];
+    _layout.scrollDirection = TTGTagCollectionScrollDirectionVertical;
+    _layout.horizontalSpacing = 4;
+    _layout.verticalSpacing = 4;
+    _layout.contentInset = UIEdgeInsetsMake(2, 2, 2, 2);
 
     // Init collection view
-    UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
-    [self addSubview:collectionView];
-    collectionView.delegate = self;
-    collectionView.dataSource = self;
-    collectionView.backgroundColor = [UIColor clearColor];
+    _collectionView = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:_layout];
+    [self addSubview:_collectionView];
+    _collectionView.delegate = self;
+    _collectionView.dataSource = self;
+    _collectionView.backgroundColor = [UIColor clearColor];
 
     // Register cell
-    [collectionView registerClass:[TTGTagCollectionCell class] forCellWithReuseIdentifier:TTGTagCollectionCellIdentifier];
+    [_collectionView registerClass:[TTGTagCollectionCell class] forCellWithReuseIdentifier:TTGTagCollectionCellIdentifier];
 
-    _layout = layout;
-    _collectionView = collectionView;
-    
+    // Add KVO
     [_collectionView addObserver:self forKeyPath:@"contentSize" options:NSKeyValueObservingOptionNew context:nil];
 }
 
-- (void)dealloc {
-    [_collectionView removeObserver:self forKeyPath:@"contentSize"];
-}
-
 #pragma mark - Setter Getter
+
 - (CGSize)contentSize {
     return _layout.collectionViewContentSize;
 }
 
+- (CGFloat)horizontalSpacing {
+    return _layout.horizontalSpacing;
+}
+
 - (void)setHorizontalSpacing:(CGFloat)horizontalSpacing {
-    _horizontalSpacing = horizontalSpacing;
-    _layout.minimumInteritemSpacing = horizontalSpacing;
-    [_collectionView reloadData];
+    _layout.horizontalSpacing = horizontalSpacing;
+    [self reload];
+}
+
+- (CGFloat)verticalSpacing {
+    return _layout.verticalSpacing;
 }
 
 - (void)setVerticalSpacing:(CGFloat)verticalSpacing {
-    _verticalSpacing = verticalSpacing;
-    _layout.minimumLineSpacing = verticalSpacing;
-    [_collectionView reloadData];
+    _layout.verticalSpacing = verticalSpacing;
+    [self reload];
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
+- (TTGTagCollectionScrollDirection)scrollDirection {
+    return _layout.scrollDirection;
+}
+
+- (void)setScrollDirection:(TTGTagCollectionScrollDirection)scrollDirection {
+    _layout.scrollDirection = scrollDirection;
+    [self reload];
+}
+
+- (NSUInteger)numberOfLines {
+    return _layout.numberOfLines;
+}
+
+- (void)setNumberOfLines:(NSUInteger)numberOfLines {
+    numberOfLines = numberOfLines == 0 ? 1 : numberOfLines;
+    _layout.numberOfLines = numberOfLines;
+}
+
+- (UIEdgeInsets)contentInset {
+    return _layout.contentInset;
+}
+
+- (void)setContentInset:(UIEdgeInsets)contentInset {
+    _layout.contentInset = contentInset;
+}
+
+- (TTGTagCollectionAlignment)alignment {
+    return _layout.alignment;
+}
+
+- (void)setAlignment:(TTGTagCollectionAlignment)alignment {
+    _layout.alignment = alignment;
+}
+
+#pragma mark - KVO
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *, id> *)change context:(void *)context {
     if ([keyPath isEqualToString:@"contentSize"]) {
-        CGSize contentSize = ((NSValue *)change[NSKeyValueChangeNewKey]).CGSizeValue;
-        
-        // Update height
-        _contentHeight = contentSize.height;
-        
+        CGSize contentSize = ((NSValue *) change[NSKeyValueChangeNewKey]).CGSizeValue;
+
         // Call back
-        if ([_delegate respondsToSelector:@selector(tagCollectionView:updateContentHeight:)]) {
-            [_delegate tagCollectionView:self updateContentHeight:contentSize.height];
+        if ([_delegate respondsToSelector:@selector(tagCollectionView:updateContentSize:)]) {
+            [_delegate tagCollectionView:self updateContentSize:contentSize];
         }
     }
 }

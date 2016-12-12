@@ -4,6 +4,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import "TTGTagCollectionView.h"
 
 @class TTGTextTagCollectionView;
 
@@ -11,7 +12,7 @@
 @optional
 - (void)textTagCollectionView:(TTGTextTagCollectionView *)textTagCollectionView didTapTag:(NSString *)tagText atIndex:(NSUInteger)index selected:(BOOL)selected;
 
-- (void)textTagCollectionView:(TTGTextTagCollectionView *)textTagCollectionView updateContentHeight:(CGFloat)newContentHeight;
+- (void)textTagCollectionView:(TTGTextTagCollectionView *)textTagCollectionView updateContentSize:(CGSize)contentSize;
 @end
 
 @interface TTGTextTagCollectionView : UIView
@@ -44,8 +45,26 @@
 @property (assign, nonatomic) CGFloat horizontalSpacing;
 @property (assign, nonatomic) CGFloat verticalSpacing;
 
-// Content heigth
-@property (assign, nonatomic, readonly) CGFloat contentHeight;
+// Content size
+@property (nonatomic, assign, readonly) CGSize contentSize;
+
+// Scroll direction. Default is vertical.
+@property (nonatomic, assign) TTGTagCollectionScrollDirection scrollDirection;
+
+// Tags layout alignment, default is left
+@property (nonatomic, assign) TTGTagCollectionAlignment alignment;
+
+// Number of lines for horizontal direction
+@property (nonatomic, assign) NSUInteger numberOfLines;
+
+// Tag shadow
+@property (nonatomic, copy) UIColor *shadowColor;    // Default is [UIColor black]
+@property (nonatomic, assign) CGSize shadowOffset;   // Default is CGSizeZero
+@property (nonatomic, assign) CGFloat shadowRadius;  // Default is 0f
+@property (nonatomic, assign) CGFloat shadowOpacity; // Default is 0.5f
+
+// Content inset, default is UIEdgeInsetsMake(2, 2, 2, 2)
+@property (nonatomic, assign) UIEdgeInsets contentInset;
 
 - (void)reload;
 

@@ -3,7 +3,6 @@
 //
 
 #import "TTGTextTagCollectionView.h"
-#import "TTGTagCollectionView.h"
 
 #pragma mark - -----TTGTextTagLabel-----
 
@@ -56,18 +55,27 @@
     _enableTagSelection = YES;
     _tagLabels = [NSMutableArray new];
 
-    _tagTextFont = [UIFont systemFontOfSize:18.0f];
-    _tagTextColor = [UIColor lightGrayColor];
+    _tagTextFont = [UIFont systemFontOfSize:20.0f];
+    
+    _tagTextColor = [UIColor whiteColor];
     _tagSelectedTextColor = [UIColor whiteColor];
-    _extraSpace = CGSizeMake(8, 8);
-    _tagBackgroundColor = [UIColor whiteColor];
-    _tagSelectedBackgroundColor = [UIColor colorWithRed:3 / 256.0f green:169 / 256.0f blue:244 / 256.0f alpha:1];
+    
+    _extraSpace = CGSizeMake(14, 14);
+    self.horizontalSpacing = 8;
+    self.verticalSpacing = 8;
+    
+    _tagBackgroundColor = [UIColor colorWithRed:0.30 green:0.72 blue:0.53 alpha:1.00];
+    _tagSelectedBackgroundColor = [UIColor colorWithRed:0.22 green:0.29 blue:0.36 alpha:1.00];
+    
     _tagCornerRadius = 4.0f;
+    
     _tagBorderWidth = 1.0f;
-    _tagBorderColor = [UIColor lightGrayColor];
-
-    _horizontalSpacing = 4.0f;
-    _verticalSpacing = 4.0f;
+    _tagBorderColor = [UIColor whiteColor];
+    
+    self.shadowColor = [UIColor blackColor];
+    self.shadowOffset = CGSizeMake(2, 2);
+    self.shadowRadius = 2;
+    self.shadowOpacity = 0.3f;
 
     _tagCollectionView = [TTGTagCollectionView new];
     _tagCollectionView.delegate = self;
@@ -222,9 +230,9 @@
     return _tagLabels[index].frame.size;
 }
 
-- (void)tagCollectionView:(TTGTagCollectionView *)tagCollectionView updateContentHeight:(CGFloat)newContentHeight {
-    if ([_delegate respondsToSelector:@selector(textTagCollectionView:updateContentHeight:)]) {
-        [_delegate textTagCollectionView:self updateContentHeight:newContentHeight];
+- (void)tagCollectionView:(TTGTagCollectionView *)tagCollectionView updateContentSize:(CGSize)contentSize {
+    if ([_delegate respondsToSelector:@selector(textTagCollectionView:updateContentSize:)]) {
+        [_delegate textTagCollectionView:self updateContentSize:contentSize];
     }
 }
 
@@ -311,20 +319,88 @@
     [self resetAllLabelStyle];
 }
 
+- (CGFloat)horizontalSpacing {
+    return _tagCollectionView.horizontalSpacing;
+}
+
 - (void)setHorizontalSpacing:(CGFloat)horizontalSpacing {
-    _horizontalSpacing = horizontalSpacing;
     _tagCollectionView.horizontalSpacing = horizontalSpacing;
-    [_tagCollectionView reload];
+}
+
+- (CGFloat)verticalSpacing {
+    return _tagCollectionView.verticalSpacing;
 }
 
 - (void)setVerticalSpacing:(CGFloat)verticalSpacing {
-    _verticalSpacing = verticalSpacing;
     _tagCollectionView.verticalSpacing = verticalSpacing;
-    [_tagCollectionView reload];
 }
 
-- (CGFloat)contentHeight {
-    return _tagCollectionView.contentHeight;
+- (CGSize)contentSize {
+    return _tagCollectionView.contentSize;
+}
+
+- (TTGTagCollectionScrollDirection)scrollDirection {
+    return _tagCollectionView.scrollDirection;
+}
+
+- (void)setScrollDirection:(TTGTagCollectionScrollDirection)scrollDirection {
+    _tagCollectionView.scrollDirection = scrollDirection;
+}
+
+- (TTGTagCollectionAlignment)alignment {
+    return _tagCollectionView.alignment;
+}
+
+- (void)setAlignment:(TTGTagCollectionAlignment)alignment {
+    _tagCollectionView.alignment = alignment;
+}
+
+- (NSUInteger)numberOfLines {
+    return _tagCollectionView.numberOfLines;
+}
+
+- (void)setNumberOfLines:(NSUInteger)numberOfLines {
+    _tagCollectionView.numberOfLines = numberOfLines;
+}
+
+- (UIColor *)shadowColor {
+    return _tagCollectionView.shadowColor;
+}
+
+- (void)setShadowColor:(UIColor *)shadowColor {
+    _tagCollectionView.shadowColor = shadowColor;
+}
+
+- (CGSize)shadowOffset {
+    return _tagCollectionView.shadowOffset;
+}
+
+- (void)setShadowOffset:(CGSize)shadowOffset {
+    _tagCollectionView.shadowOffset = shadowOffset;
+}
+
+- (CGFloat)shadowRadius {
+    return _tagCollectionView.shadowRadius;
+}
+
+- (void)setShadowRadius:(CGFloat)shadowRadius {
+    _tagCollectionView.shadowRadius = shadowRadius;
+}
+
+- (CGFloat)shadowOpacity {
+    return _tagCollectionView.shadowOpacity;
+}
+
+- (void)setShadowOpacity:(CGFloat)shadowOpacity {
+    _tagCollectionView.shadowOpacity = shadowOpacity;
+}
+
+- (UIEdgeInsets)contentInset {
+    return _tagCollectionView.contentInset;
+}
+
+- (void)setContentInset:(UIEdgeInsets)contentInset {
+    _tagCollectionView.contentInset = contentInset;
 }
 
 #pragma mark - Private methods
