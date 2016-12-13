@@ -60,7 +60,7 @@ typedef NS_ENUM(NSInteger, TTGTagCollectionAlignment) {
 @property (nonatomic, assign) TTGTagCollectionScrollDirection scrollDirection;
 
 /**
- * Tags layout alignment, default is left, only work when scroll vertically
+ * Tags layout alignment, default is left.
  */
 @property (nonatomic, assign) TTGTagCollectionAlignment alignment;
 
@@ -83,9 +83,9 @@ typedef NS_ENUM(NSInteger, TTGTagCollectionAlignment) {
 /**
  * Tag shadow
  */
-@property (nonatomic, strong) UIColor *shadowColor; // Default is [UIColor black]
-@property (nonatomic, assign) CGSize shadowOffset; // Default is CGSizeZero
-@property (nonatomic, assign) CGFloat shadowRadius; // Default is 0f
+@property (nonatomic, strong) UIColor *shadowColor;  // Default is [UIColor black]
+@property (nonatomic, assign) CGSize shadowOffset;   // Default is CGSizeZero
+@property (nonatomic, assign) CGFloat shadowRadius;  // Default is 0f
 @property (nonatomic, assign) CGFloat shadowOpacity; // Default is 0.5f
 
 /**
