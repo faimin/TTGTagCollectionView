@@ -17,15 +17,16 @@
 
 @interface TTGTextTagCollectionView : UIView
 @property (weak, nonatomic) id <TTGTextTagCollectionViewDelegate> delegate;
+
+// Define if the tag can be selected.
 @property (assign, nonatomic) BOOL enableTagSelection;
 
 // Text
 @property (strong, nonatomic) UIFont *tagTextFont;
+
+// Text color
 @property (strong, nonatomic) UIColor *tagTextColor;
 @property (strong, nonatomic) UIColor *tagSelectedTextColor;
-
-// Extra space
-@property (assign, nonatomic) CGSize extraSpace;
 
 // Background color
 @property (strong, nonatomic) UIColor *tagBackgroundColor;
@@ -41,30 +42,33 @@
 @property (strong, nonatomic) UIColor *tagBorderColor;
 @property (strong, nonatomic) UIColor *tagSelectedBorderColor;
 
-// Space
+// Tag shadow.
+@property (nonatomic, copy) UIColor *tagShadowColor;    // Default is [UIColor black]
+@property (nonatomic, assign) CGSize tagShadowOffset;   // Default is (2, 2)
+@property (nonatomic, assign) CGFloat tagShadowRadius;  // Default is 2f
+@property (nonatomic, assign) CGFloat tagShadowOpacity; // Default is 0.3f
+
+// Tags scroll direction, default is vertical.
+@property (nonatomic, assign) TTGTagCollectionScrollDirection scrollDirection;
+
+// Tags layout alignment, default is left.
+@property (nonatomic, assign) TTGTagCollectionAlignment alignment;
+
+// Number of lines. 0 means no limit, default is 0 for vertical and 1 for horizontal.
+@property (nonatomic, assign) NSUInteger numberOfLines;
+
+// Each tag extra space in width and height
+@property (assign, nonatomic) CGSize tagExtraSpace;
+
+// Horizontal and vertical space between tags, default is 4.
 @property (assign, nonatomic) CGFloat horizontalSpacing;
 @property (assign, nonatomic) CGFloat verticalSpacing;
 
-// Content size
-@property (nonatomic, assign, readonly) CGSize contentSize;
-
-// Scroll direction. Default is vertical.
-@property (nonatomic, assign) TTGTagCollectionScrollDirection scrollDirection;
-
-// Tags layout alignment, default is left
-@property (nonatomic, assign) TTGTagCollectionAlignment alignment;
-
-// Number of lines for horizontal direction
-@property (nonatomic, assign) NSUInteger numberOfLines;
-
-// Tag shadow
-@property (nonatomic, copy) UIColor *shadowColor;    // Default is [UIColor black]
-@property (nonatomic, assign) CGSize shadowOffset;   // Default is CGSizeZero
-@property (nonatomic, assign) CGFloat shadowRadius;  // Default is 0f
-@property (nonatomic, assign) CGFloat shadowOpacity; // Default is 0.5f
-
-// Content inset, default is UIEdgeInsetsMake(2, 2, 2, 2)
+// Content inset, default is UIEdgeInsetsMake(2, 2, 2, 2).
 @property (nonatomic, assign) UIEdgeInsets contentInset;
+
+// The true tags content size, readonly
+@property (nonatomic, assign, readonly) CGSize contentSize;
 
 - (void)reload;
 
