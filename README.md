@@ -4,10 +4,12 @@
 [![Version](https://img.shields.io/cocoapods/v/TTGTagCollectionView.svg?style=flat)](http://cocoapods.org/pods/TTGTagCollectionView)
 [![License](https://img.shields.io/cocoapods/l/TTGTagCollectionView.svg?style=flat)](http://cocoapods.org/pods/TTGTagCollectionView)
 [![Platform](https://img.shields.io/cocoapods/p/TTGTagCollectionView.svg?style=flat)](http://cocoapods.org/pods/TTGTagCollectionView)
-[![Apps Using](https://img.shields.io/badge/Apps%20Using-%3E%20150-blue.svg)](https://github.com/zekunyan/TTGTagCollectionView)
-[![Total Download](https://img.shields.io/badge/Total%20Download-%3E%209948-blue.svg)](https://github.com/zekunyan/TTGTagCollectionView)
+[![Apps Using](https://img.shields.io/badge/Apps%20Using-%3E%20255-blue.svg)](https://github.com/zekunyan/TTGTagCollectionView)
+[![Total Download](https://img.shields.io/badge/Total%20Download-%3E%2014,454-blue.svg)](https://github.com/zekunyan/TTGTagCollectionView)
 
 ![Screenshot](https://github.com/zekunyan/TTGTagCollectionView/raw/master/Resources/screen_shot.png)
+
+![Alignment Type](https://github.com/zekunyan/TTGTagCollectionView/raw/master/Resources/alignment_type.png)
 
 ## What 
 
@@ -58,6 +60,8 @@ Conform the `TTGTextTagCollectionViewDelegate` protocol to get callback when you
 ```
 @protocol TTGTextTagCollectionViewDelegate <NSObject>
 @optional
+- (BOOL)textTagCollectionView:(TTGTextTagCollectionView *)textTagCollectionView canTapTag:(NSString *)tagText atIndex:(NSUInteger)index currentSelected:(BOOL)currentSelected;
+
 - (void)textTagCollectionView:(TTGTextTagCollectionView *)textTagCollectionView didTapTag:(NSString *)tagText atIndex:(NSUInteger)index selected:(BOOL)selected;
 
 - (void)textTagCollectionView:(TTGTextTagCollectionView *)textTagCollectionView updateContentSize:(CGSize)contentSize;
@@ -104,6 +108,9 @@ Conform the `TTGTextTagCollectionViewDelegate` protocol to get callback when you
 
 // Number of lines. 0 means no limit, default is 0 for vertical and 1 for horizontal.
 @property (nonatomic, assign) NSUInteger numberOfLines;
+
+// Tag selection limit, default is 0, means no limit
+@property (nonatomic, assign) NSUInteger selectionLimit;
 
 // Each tag extra space in width and height
 @property (assign, nonatomic) CGSize tagExtraSpace;
@@ -183,6 +190,8 @@ Just like the UITableView, you must conform and implement the required methods o
 - (CGSize)tagCollectionView:(TTGTagCollectionView *)tagCollectionView sizeForTagAtIndex:(NSUInteger)index;
 
 @optional
+- (BOOL)tagCollectionView:(TTGTagCollectionView *)tagCollectionView shouldSelectTag:(UIView *)tagView atIndex:(NSUInteger)index;
+
 - (void)tagCollectionView:(TTGTagCollectionView *)tagCollectionView didSelectTag:(UIView *)tagView atIndex:(NSUInteger)index;
 
 - (void)tagCollectionView:(TTGTagCollectionView *)tagCollectionView updateContentSize:(CGSize)contentSize;
@@ -210,6 +219,10 @@ Just like the UITableView, you must conform and implement the required methods o
 
 // The true tags content size, readonly
 @property (nonatomic, assign, readonly) CGSize contentSize;
+
+// Scroll indicator
+@property (nonatomic, assign) BOOL showsHorizontalScrollIndicator;
+@property (nonatomic, assign) BOOL showsVerticalScrollIndicator;
 ```
 
 #### Reload
@@ -228,3 +241,5 @@ zekunyan, zekunyan@163.com
 ## License
 
 TTGTagCollectionView is available under the MIT license. See the LICENSE file for more info.
+
+
