@@ -4,10 +4,12 @@
 [![Version](https://img.shields.io/cocoapods/v/TTGTagCollectionView.svg?style=flat)](http://cocoapods.org/pods/TTGTagCollectionView)
 [![License](https://img.shields.io/cocoapods/l/TTGTagCollectionView.svg?style=flat)](http://cocoapods.org/pods/TTGTagCollectionView)
 [![Platform](https://img.shields.io/cocoapods/p/TTGTagCollectionView.svg?style=flat)](http://cocoapods.org/pods/TTGTagCollectionView)
-[![Apps Using](https://img.shields.io/badge/Apps%20Using-%3E%20150-blue.svg)](https://github.com/zekunyan/TTGTagCollectionView)
-[![Total Download](https://img.shields.io/badge/Total%20Download-%3E%209948-blue.svg)](https://github.com/zekunyan/TTGTagCollectionView)
+[![Apps Using](https://img.shields.io/badge/Apps%20Using-%3E%20255-blue.svg)](https://github.com/zekunyan/TTGTagCollectionView)
+[![Total Download](https://img.shields.io/badge/Total%20Download-%3E%2014,454-blue.svg)](https://github.com/zekunyan/TTGTagCollectionView)
 
 ![Screenshot](https://github.com/zekunyan/TTGTagCollectionView/raw/master/Resources/screen_shot.png)
+
+![Alignment Type](https://github.com/zekunyan/TTGTagCollectionView/raw/master/Resources/alignment_type.png)
 
 ## What 
 
@@ -15,11 +17,17 @@ TTGTagCollectionView is useful for showing different size tag views in a vertica
 
 ## Features
 * Both text tag and custom view tag supported.
-* Highly customizable
-* Vertical and horizontal scrollable
-* Support left, center and right aligment
-* Support specifying number of lines
-* Support Autolayout `intrinsicContentSize` to auto determine height based on content size
+* Highly customizable, each text tag can be configured.
+* Vertical and horizontal scrollable.
+* Support different kinds of aligment types.
+* Support specifying number of lines.
+* Support Autolayout `intrinsicContentSize` to auto determine height based on content size.
+* Support pull to refresh, like `SVPullToRefresh`.
+
+## Demo
+You can find demos in the `Example->TTGTagCollectionView.xcworkspace` project.
+
+![Example project](https://github.com/zekunyan/TTGTagCollectionView/raw/master/Resources/demo_example.png)
 
 ## Requirements
 iOS 7 and later.
@@ -58,6 +66,8 @@ Conform the `TTGTextTagCollectionViewDelegate` protocol to get callback when you
 ```
 @protocol TTGTextTagCollectionViewDelegate <NSObject>
 @optional
+- (BOOL)textTagCollectionView:(TTGTextTagCollectionView *)textTagCollectionView canTapTag:(NSString *)tagText atIndex:(NSUInteger)index currentSelected:(BOOL)currentSelected;
+
 - (void)textTagCollectionView:(TTGTextTagCollectionView *)textTagCollectionView didTapTag:(NSString *)tagText atIndex:(NSUInteger)index selected:(BOOL)selected;
 
 - (void)textTagCollectionView:(TTGTextTagCollectionView *)textTagCollectionView updateContentSize:(CGSize)contentSize;
@@ -65,11 +75,11 @@ Conform the `TTGTextTagCollectionViewDelegate` protocol to get callback when you
 ```
 
 #### Customization
-```
-// Define if the tag can be selected.
-@property (assign, nonatomic) BOOL enableTagSelection;
+Each tag can be configured.
 
-// Text
+```
+@interface TTGTextTagConfig : NSObject
+// Text font
 @property (strong, nonatomic) UIFont *tagTextFont;
 
 // Text color
@@ -96,6 +106,17 @@ Conform the `TTGTextTagCollectionViewDelegate` protocol to get callback when you
 @property (nonatomic, assign) CGFloat tagShadowRadius;  // Default is 2f
 @property (nonatomic, assign) CGFloat tagShadowOpacity; // Default is 0.3f
 
+// Tag extra space in width and height, will expand each tag's size
+@property (assign, nonatomic) CGSize tagExtraSpace;
+@end
+```
+
+You can also configure scroll direction, alignment, lines limit, spacing and inset.
+
+```
+// Define if the tag can be selected.
+@property (assign, nonatomic) BOOL enableTagSelection;
+
 // Tags scroll direction, default is vertical.
 @property (nonatomic, assign) TTGTagCollectionScrollDirection scrollDirection;
 
@@ -105,8 +126,8 @@ Conform the `TTGTextTagCollectionViewDelegate` protocol to get callback when you
 // Number of lines. 0 means no limit, default is 0 for vertical and 1 for horizontal.
 @property (nonatomic, assign) NSUInteger numberOfLines;
 
-// Each tag extra space in width and height
-@property (assign, nonatomic) CGSize tagExtraSpace;
+// Tag selection limit, default is 0, means no limit
+@property (nonatomic, assign) NSUInteger selectionLimit;
 
 // Horizontal and vertical space between tags, default is 4.
 @property (assign, nonatomic) CGFloat horizontalSpacing;
@@ -114,24 +135,52 @@ Conform the `TTGTextTagCollectionViewDelegate` protocol to get callback when you
 
 // Content inset, default is UIEdgeInsetsMake(2, 2, 2, 2).
 @property (nonatomic, assign) UIEdgeInsets contentInset;
+```
 
-// The true tags content size, readonly
-@property (nonatomic, assign, readonly) CGSize contentSize;
+Alignment types:
+
+```
+typedef NS_ENUM(NSInteger, TTGTagCollectionAlignment) {
+    TTGTagCollectionAlignmentLeft = 0,             // Default
+    TTGTagCollectionAlignmentCenter,               // Center
+    TTGTagCollectionAlignmentRight,                // Right
+    TTGTagCollectionAlignmentFillByExpandingSpace, // Expand horizontal spacing and fill
+    TTGTagCollectionAlignmentFillByExpandingWidth  // Expand width and fill
+};
 ```
 
 #### Config tags
 
-```
-// Add tags
-- (void)addTag:(NSString *)tag;
+Add tag.
 
+```
+// Add tag with detalt config
+- (void)addTag:(NSString *)tag;
 - (void)addTags:(NSArray <NSString *> *)tags;
 
-/// Remove tags
+// Add tag with custom config
+- (void)addTag:(NSString *)tag withConfig:(TTGTextTagConfig *)config;
+- (void)addTags:(NSArray <NSString *> *)tags withConfig:(TTGTextTagConfig *)config;
+```
+
+Insert tag.
+
+```
+// Insert tag with default config
+- (void)insertTag:(NSString *)tag atIndex:(NSUInteger)index;
+- (void)insertTags:(NSArray <NSString *> *)tags atIndex:(NSUInteger)index;
+
+// Insert tag with custom config
+- (void)insertTag:(NSString *)tag atIndex:(NSUInteger)index withConfig:(TTGTextTagConfig *)config;
+- (void)insertTags:(NSArray <NSString *> *)tags atIndex:(NSUInteger)index withConfig:(TTGTextTagConfig *)config;
+```
+
+Remove tag.
+
+```
+// Remove tag
 - (void)removeTag:(NSString *)tag;
-
 - (void)removeTagAtIndex:(NSUInteger)index;
-
 - (void)removeAllTags;
 ```
 
@@ -141,13 +190,27 @@ Conform the `TTGTextTagCollectionViewDelegate` protocol to get callback when you
 - (void)setTagAtIndex:(NSUInteger)index selected:(BOOL)selected;
 ```
 
+#### Update tag style config
+```
+// Update tag config
+- (void)setTagAtIndex:(NSUInteger)index withConfig:(TTGTextTagConfig *)config;
+- (void)setTagsInRange:(NSRange)range withConfig:(TTGTextTagConfig *)config;
+```
+
 #### Get tag information
 
 ```
+// Get tag
+- (NSString *)getTagAtIndex:(NSUInteger)index;
+- (NSArray <NSString *> *)getTagsInRange:(NSRange)range;
+
+// Get tag config
+- (TTGTextTagConfig *)getConfigAtIndex:(NSUInteger)index;
+- (NSArray <TTGTextTagConfig *> *)getConfigsInRange:(NSRange)range;
+
+// Get all
 - (NSArray <NSString *> *)allTags;
-
 - (NSArray <NSString *> *)allSelectedTags;
-
 - (NSArray <NSString *> *)allNotSelectedTags;
 ```
 
@@ -183,6 +246,8 @@ Just like the UITableView, you must conform and implement the required methods o
 - (CGSize)tagCollectionView:(TTGTagCollectionView *)tagCollectionView sizeForTagAtIndex:(NSUInteger)index;
 
 @optional
+- (BOOL)tagCollectionView:(TTGTagCollectionView *)tagCollectionView shouldSelectTag:(UIView *)tagView atIndex:(NSUInteger)index;
+
 - (void)tagCollectionView:(TTGTagCollectionView *)tagCollectionView didSelectTag:(UIView *)tagView atIndex:(NSUInteger)index;
 
 - (void)tagCollectionView:(TTGTagCollectionView *)tagCollectionView updateContentSize:(CGSize)contentSize;
@@ -210,6 +275,10 @@ Just like the UITableView, you must conform and implement the required methods o
 
 // The true tags content size, readonly
 @property (nonatomic, assign, readonly) CGSize contentSize;
+
+// Scroll indicator
+@property (nonatomic, assign) BOOL showsHorizontalScrollIndicator;
+@property (nonatomic, assign) BOOL showsVerticalScrollIndicator;
 ```
 
 #### Reload
@@ -218,9 +287,6 @@ You can reload tags programmatically.
 - (void)reload;
 ```
 
-## Example
-For more information, you can download the zip and run the example.
-
 ## Author
 
 zekunyan, zekunyan@163.com
@@ -228,3 +294,5 @@ zekunyan, zekunyan@163.com
 ## License
 
 TTGTagCollectionView is available under the MIT license. See the LICENSE file for more info.
+
+

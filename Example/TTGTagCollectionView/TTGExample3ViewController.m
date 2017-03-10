@@ -23,6 +23,7 @@
                       @"on", @"constraints", @"placed", @"on", @"those", @"views"];
     
     _tagView = [TTGTextTagCollectionView new];
+    _tagView.alignment = TTGTagCollectionAlignmentFillByExpandingWidth;
     _tagView.layer.borderColor = [UIColor grayColor].CGColor;
     _tagView.layer.borderWidth = 1;
     _tagView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -45,10 +46,6 @@
         [_tagView setTagAtIndex:arc4random_uniform((uint32_t)tags.count) selected:YES];
     }
     [_tagView reload];
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
 }
 
 @end
