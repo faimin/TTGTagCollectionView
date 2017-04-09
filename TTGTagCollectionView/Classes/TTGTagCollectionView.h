@@ -25,8 +25,8 @@ typedef NS_ENUM(NSInteger, TTGTagCollectionAlignment) {
     TTGTagCollectionAlignmentLeft = 0,             // Default
     TTGTagCollectionAlignmentCenter,               // Center
     TTGTagCollectionAlignmentRight,                // Right
-    TTGTagCollectionAlignmentFillByExpandingSpace, // Expand horizontal spacing and fill, only work for vertical scroll
-    TTGTagCollectionAlignmentFillByExpandingWidth  // Expand width and fill, only work for vertical scroll
+    TTGTagCollectionAlignmentFillByExpandingSpace, // Expand horizontal spacing and fill
+    TTGTagCollectionAlignmentFillByExpandingWidth  // Expand width and fill
 };
 
 /**
@@ -57,6 +57,9 @@ typedef NS_ENUM(NSInteger, TTGTagCollectionAlignment) {
 @interface TTGTagCollectionView : UIView
 @property (nonatomic, weak) id <TTGTagCollectionViewDataSource> dataSource;
 @property (nonatomic, weak) id <TTGTagCollectionViewDelegate> delegate;
+
+// Inside scrollView
+@property (nonatomic, strong, readonly) UIScrollView *scrollView;
 
 // Tags scroll direction, default is vertical.
 @property (nonatomic, assign) TTGTagCollectionScrollDirection scrollDirection;
